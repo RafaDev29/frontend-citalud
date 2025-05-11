@@ -1,24 +1,33 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import Tabla from '../../components/Tabla';
+import Tabla from '../Tabla';
 import API from '../../api/axios';
-import MedicamentoFormModal from './MedicamentoFormModal';
+import PacienteFormModal from './PacienteFormModal';
 
-export default function MedicamentosView() {
-  const [medicamentos, setMedicamentos] = useState([]);
+export default function PacientesView() {
+  const [pacientes, setPacientes] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState(null);
+  const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
-  const fetchMedicamentos = async () => {
+  const fetchPacientes = async () => {
     try {
-      const res = await API.get('/medicamentos/');
-      setMedicamentos(res.data);
+      const res = await API.get('/pacientes/');
+      const formateados = res.data.map(p => ({
+        id: p.id,
+        nombre: p.nombre,
+        dni: p.dni,
+        fecha: p.fecha_nacimiento,
+        telefono: p.telefono,
+        direccion: p.direccion,
+        email: p.email,
+      }));
+      setPacientes(formateados);
     } catch (error) {
-      console.error('Error al obtener medicamentos:', error);
+      console.error('Error al obtener pacientes:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudieron obtener los medicamentos.',
+        text: 'No se pudieron obtener los pacientes.',
         customClass: {
           confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
         },
@@ -28,12 +37,12 @@ export default function MedicamentosView() {
   };
 
   useEffect(() => {
-    fetchMedicamentos();
+    fetchPacientes();
   }, []);
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: '¿Eliminar este medicamento?',
+      title: '¿Eliminar este paciente?',
       text: 'Esta acción no se puede deshacer.',
       icon: 'warning',
       showCancelButton: true,
@@ -49,19 +58,19 @@ export default function MedicamentosView() {
 
     if (result.isConfirmed) {
       try {
-        await API.delete(`/medicamentos/${id}/`);
-        fetchMedicamentos();
+        await API.delete(`/pacientes/${id}/`);
+        fetchPacientes();
         Swal.fire({
           icon: 'success',
           title: 'Eliminado',
-          text: 'El medicamento ha sido eliminado correctamente.',
+          text: 'El paciente ha sido eliminado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
           buttonsStyling: false,
         });
       } catch (err) {
-        const msg = err?.response?.data?.message || 'Error al eliminar el medicamento.';
+        const msg = err?.response?.data?.message || 'Error al eliminar paciente.';
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -75,35 +84,35 @@ export default function MedicamentosView() {
     }
   };
 
-  const handleCreate = () => {
-    setMedicamentoSeleccionado(null);
+  const handleEdit = (paciente) => {
+    setPacienteSeleccionado(paciente);
     setModalVisible(true);
   };
 
-  const handleEdit = (medicamento) => {
-    setMedicamentoSeleccionado(medicamento);
+  const handleCreate = () => {
+    setPacienteSeleccionado(null);
     setModalVisible(true);
   };
 
   const handleSave = async (formData) => {
     try {
-      if (medicamentoSeleccionado) {
-        await API.put(`/medicamentos/${medicamentoSeleccionado.id}/`, formData);
+      if (pacienteSeleccionado) {
+        await API.put(`/pacientes/${pacienteSeleccionado.id}/`, formData);
         Swal.fire({
           icon: 'success',
           title: 'Actualizado',
-          text: 'El medicamento fue actualizado correctamente.',
+          text: 'El paciente fue actualizado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
           buttonsStyling: false,
         });
       } else {
-        await API.post('/medicamentos/', formData);
+        await API.post('/pacientes/', formData);
         Swal.fire({
           icon: 'success',
           title: 'Creado',
-          text: 'El medicamento fue registrado correctamente.',
+          text: 'El paciente fue registrado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
@@ -111,12 +120,12 @@ export default function MedicamentosView() {
         });
       }
       setModalVisible(false);
-      fetchMedicamentos();
+      fetchPacientes();
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.detail ||
-        'Error al guardar medicamento.';
+        'Error al guardar paciente.';
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -129,32 +138,32 @@ export default function MedicamentosView() {
     }
   };
 
-  const headers = ['ID', 'Nombre', 'Descripción', 'Presentación', 'Laboratorio'];
+  const headers = ['ID', 'Nombre', 'DNI', 'Fecha', 'Teléfono', 'Dirección', 'Email'];
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-blue-700">Medicamentos</h1>
+        <h1 className="text-2xl font-bold text-blue-700">Pacientes</h1>
         <button
           onClick={handleCreate}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          + Nuevo medicamento
+          + Nuevo paciente
         </button>
       </div>
 
       <Tabla
         headers={headers}
-        rows={medicamentos}
+        rows={pacientes}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
-      <MedicamentoFormModal
+      <PacienteFormModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSave={handleSave}
-        medicamento={medicamentoSeleccionado}
+        paciente={pacienteSeleccionado}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import MainLayout from '../layout/MainLayout';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import useAuthStore from '../store/auth';
+import Servicios from '../pages/Servicios';
 
 export default function AppRoutes() {
   const authorized = useAuthStore((state) => state.authorized);
@@ -37,6 +38,7 @@ export default function AppRoutes() {
           <Route path="/pacientes" element={<Pacientes />} />
           <Route path="/atenciones" element={<Atenciones />} />
           <Route path="/medicamentos" element={<Medicamentos />} />
+          <Route path="/servicios" element={<Servicios />} />
         </Route>
 
         <Route

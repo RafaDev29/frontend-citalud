@@ -2,23 +2,23 @@ import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import Tabla from '../../components/Tabla';
 import API from '../../api/axios';
-import MedicamentoFormModal from './MedicamentoFormModal';
+import ServicioFormModal from './ServicioFormModal';
 
-export default function MedicamentosView() {
-  const [medicamentos, setMedicamentos] = useState([]);
+export default function ServiciosView() {
+  const [servicios, setServicios] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState(null);
+  const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
 
-  const fetchMedicamentos = async () => {
+  const fetchServicios = async () => {
     try {
-      const res = await API.get('/medicamentos/');
-      setMedicamentos(res.data);
+      const res = await API.get('/servicios/');
+      setServicios(res.data);
     } catch (error) {
-      console.error('Error al obtener medicamentos:', error);
+      console.error('Error al obtener servicios:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudieron obtener los medicamentos.',
+        text: 'No se pudieron obtener los servicios.',
         customClass: {
           confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
         },
@@ -28,12 +28,12 @@ export default function MedicamentosView() {
   };
 
   useEffect(() => {
-    fetchMedicamentos();
+    fetchServicios();
   }, []);
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: '¿Eliminar este medicamento?',
+      title: '¿Eliminar este servicio?',
       text: 'Esta acción no se puede deshacer.',
       icon: 'warning',
       showCancelButton: true,
@@ -49,19 +49,19 @@ export default function MedicamentosView() {
 
     if (result.isConfirmed) {
       try {
-        await API.delete(`/medicamentos/${id}/`);
-        fetchMedicamentos();
+        await API.delete(`/servicios/${id}/`);
+        fetchServicios();
         Swal.fire({
           icon: 'success',
           title: 'Eliminado',
-          text: 'El medicamento ha sido eliminado correctamente.',
+          text: 'El servicio fue eliminado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
           buttonsStyling: false,
         });
       } catch (err) {
-        const msg = err?.response?.data?.message || 'Error al eliminar el medicamento.';
+        const msg = err?.response?.data?.message || 'Error al eliminar el servicio.';
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -76,34 +76,34 @@ export default function MedicamentosView() {
   };
 
   const handleCreate = () => {
-    setMedicamentoSeleccionado(null);
+    setServicioSeleccionado(null);
     setModalVisible(true);
   };
 
-  const handleEdit = (medicamento) => {
-    setMedicamentoSeleccionado(medicamento);
+  const handleEdit = (servicio) => {
+    setServicioSeleccionado(servicio);
     setModalVisible(true);
   };
 
   const handleSave = async (formData) => {
     try {
-      if (medicamentoSeleccionado) {
-        await API.put(`/medicamentos/${medicamentoSeleccionado.id}/`, formData);
+      if (servicioSeleccionado) {
+        await API.put(`/servicios/${servicioSeleccionado.id}/`, formData);
         Swal.fire({
           icon: 'success',
           title: 'Actualizado',
-          text: 'El medicamento fue actualizado correctamente.',
+          text: 'El servicio fue actualizado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
           buttonsStyling: false,
         });
       } else {
-        await API.post('/medicamentos/', formData);
+        await API.post('/servicios/', formData);
         Swal.fire({
           icon: 'success',
           title: 'Creado',
-          text: 'El medicamento fue registrado correctamente.',
+          text: 'El servicio fue registrado correctamente.',
           customClass: {
             confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
           },
@@ -111,12 +111,12 @@ export default function MedicamentosView() {
         });
       }
       setModalVisible(false);
-      fetchMedicamentos();
+      fetchServicios();
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.detail ||
-        'Error al guardar medicamento.';
+        'Error al guardar servicio.';
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -129,32 +129,32 @@ export default function MedicamentosView() {
     }
   };
 
-  const headers = ['ID', 'Nombre', 'Descripción', 'Presentación', 'Laboratorio'];
+  const headers = ['ID', 'Nombre', 'Tipo', 'Descripción', 'Precio'];
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-blue-700">Medicamentos</h1>
+        <h1 className="text-2xl font-bold text-blue-700">Servicios Médicos</h1>
         <button
           onClick={handleCreate}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          + Nuevo medicamento
+          + Nuevo servicio
         </button>
       </div>
 
       <Tabla
         headers={headers}
-        rows={medicamentos}
-        onEdit={handleEdit}
+        rows={servicios}
         onDelete={handleDelete}
+        onEdit={handleEdit}
       />
 
-      <MedicamentoFormModal
+      <ServicioFormModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSave={handleSave}
-        medicamento={medicamentoSeleccionado}
+        servicio={servicioSeleccionado}
       />
     </div>
   );

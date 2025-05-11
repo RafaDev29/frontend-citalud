@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import Tabla from '../../components/Tabla';
 import API from '../../api/axios';
 import AtencionFormModal from './AtencionFormModal';
@@ -15,6 +16,7 @@ export default function AtencionesView() {
       setAtenciones(res.data);
     } catch (error) {
       console.error('Error al obtener atenciones:', error);
+      Swal.fire('Error', 'No se pudieron obtener las atenciones', 'error');
     }
   };
 
@@ -24,6 +26,7 @@ export default function AtencionesView() {
       setCitas(res.data);
     } catch (error) {
       console.error('Error al obtener citas:', error);
+      Swal.fire('Error', 'No se pudieron obtener las citas', 'error');
     }
   };
 
@@ -32,15 +35,31 @@ export default function AtencionesView() {
     fetchCitas();
   }, []);
 
-  // eslint-disable-next-line no-restricted-globals
   const handleDelete = async (id) => {
-       // eslint-disable-next-line no-restricted-globals
-    if (confirm('¿Eliminar esta atención?')) {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará la atención permanentemente.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700',
+        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 ml-2',
+        popup: 'rounded-lg',
+      },
+      buttonsStyling: false, // ¡Importante! para que usen las clases personalizadas
+    });
+    
+
+    if (result.isConfirmed) {
       try {
         await API.delete(`/atenciones/${id}/`);
         fetchAtenciones();
+        Swal.fire('Eliminado', 'La atención fue eliminada correctamente.', 'success');
       } catch (err) {
-        console.error('Error al eliminar atención:', err);
+        const msg = err?.response?.data?.message || 'Ocurrió un error al eliminar';
+        Swal.fire('Error', msg, 'error');
       }
     }
   };
@@ -59,13 +78,29 @@ export default function AtencionesView() {
     try {
       if (atencionSeleccionada) {
         await API.put(`/atenciones/${atencionSeleccionada.id}/`, formData);
+        Swal.fire('Actualizado', 'La atención fue actualizada correctamente.', 'success');
       } else {
         await API.post('/atenciones/', formData);
+        Swal.fire({
+          icon: 'success',
+          title: 'Creado',
+          text: 'La atención fue registrada correctamente.',
+          customClass: {
+            confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
+            popup: 'rounded-lg',
+          },
+          buttonsStyling: false,
+        });
+        
       }
       setModalVisible(false);
       fetchAtenciones();
     } catch (err) {
-      console.error('Error al guardar atención:', err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.detail ||
+        'Error al guardar atención.';
+      Swal.fire('Error', msg, 'error');
     }
   };
 

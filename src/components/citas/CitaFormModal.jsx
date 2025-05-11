@@ -92,7 +92,7 @@ function CitaFormModal({ visible, onClose, onSave, pacientes, cita }) {
           className="w-full border px-3 py-2 rounded"
         >
           <option value="PENDIENTE">PENDIENTE</option>
-          <option value="REALIZADA">REALIZADA</option>
+          <option value="ATENDIDA">ATENDIDA</option>
           <option value="CANCELADA">CANCELADA</option>
         </select>
 
