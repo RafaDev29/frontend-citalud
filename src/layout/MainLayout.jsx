@@ -20,7 +20,10 @@ function MainLayout() {
         <nav className="flex flex-col gap-2">
         <Link to="/pacientes" className="hover:underline">Pacientes</Link>
           <Link to="/citas" className="hover:underline">Citas</Link>
+          <Link to="/atenciones" className="hover:underline">Atenciones</Link>
+          <Link to="/medicamentos" className="hover:underline">Medicamentos</Link>
           <Link to="/perfil" className="hover:underline">Perfil</Link>
+  
           <button onClick={handleLogout} className="mt-4 text-red-300 hover:text-red-500 text-left">Cerrar sesión</button>
         </nav>
       </aside>

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import Citas from '../pages/Citas';
 import Pacientes from '../pages/Pacientes';
+import Atenciones from '../pages/Atenciones';
+import Medicamentos from '../pages/Medicamentos'
 import MainLayout from '../layout/MainLayout';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
@@ -33,6 +35,8 @@ export default function AppRoutes() {
         >
           <Route path="/citas" element={<Citas />} />
           <Route path="/pacientes" element={<Pacientes />} />
+          <Route path="/atenciones" element={<Atenciones />} />
+          <Route path="/medicamentos" element={<Medicamentos />} />
         </Route>
 
         <Route
